@@ -1,0 +1,11 @@
+.env
+.env.local
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+*.log
+downloads/
+credentials.json
+token.pickle
