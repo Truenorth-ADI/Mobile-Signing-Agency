@@ -104,7 +104,8 @@ class GmailMonitor:
                     Config.GMAIL_OAUTH_CREDENTIALS_FILE,
                     Config.GMAIL_SCOPES
                 )
-                creds = flow.run_local_server(port=0)
+                # In headless/Docker environment, use local server without browser
+                creds = flow.run_local_server(port=0, open_browser=False)
             
             # Save token for next run
             import pickle
