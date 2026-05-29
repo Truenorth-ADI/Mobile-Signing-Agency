@@ -24,19 +24,19 @@ from pathlib import Path
 
 import aiohttp
 from google.auth.transport.requests import Request
-from google.oauth2.service_account import Credentials
-from google.auth.oauth2.service_account import Credentials as SACredentials
 from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
 from playwright.async_api import async_playwright, Browser, Page
 
 # Configure logging
+log_dir = os.getenv('LOG_DIR', '/var/log/ss-confirm')
+os.makedirs(log_dir, exist_ok=True)
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('ss_confirm.log'),
+        logging.FileHandler(os.path.join(log_dir, 'ss_confirm.log')),
         logging.StreamHandler()
     ]
 )
@@ -46,9 +46,12 @@ logger = logging.getLogger(__name__)
 class Config:
     """SS-Confirm configuration from environment."""
     
+    # Base directory (Docker-friendly)
+    BASE_DIR = os.getenv('BASE_DIR', '/opt/ss-confirm')
+    
     # Gmail OAuth
-    GMAIL_OAUTH_CREDENTIALS_FILE = os.getenv('GMAIL_OAUTH_CREDENTIALS_FILE', 'credentials.json')
-    GMAIL_TOKEN_FILE = os.getenv('GMAIL_TOKEN_FILE', 'token.pickle')
+    GMAIL_OAUTH_CREDENTIALS_FILE = os.getenv('GMAIL_OAUTH_CREDENTIALS_FILE', os.path.join(BASE_DIR, 'credentials.json'))
+    GMAIL_TOKEN_FILE = os.getenv('GMAIL_TOKEN_FILE', os.path.join(BASE_DIR, 'token.pickle'))
     GMAIL_SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
     
     # SingleSource Portal
@@ -61,8 +64,8 @@ class Config:
     WEBHOOK_URL = os.getenv('WEBHOOK_URL', 'https://msaok.base44.app/api/functions/webhookCreateSigning')
     WEBHOOK_SECRET = os.getenv('WEBHOOK_SECRET', 'cqsstSfDIYg1YiYZQAx9ag-bLpmc9ElEUYeLp9t0QT4')
     
-    # Download directory
-    DOWNLOAD_DIR = os.getenv('DOWNLOAD_DIR', './downloads')
+    # Download directory (Docker-friendly)
+    DOWNLOAD_DIR = os.getenv('DOWNLOAD_DIR', os.path.join(BASE_DIR, 'downloads'))
     
     # MFA timeout (seconds)
     MFA_TIMEOUT = int(os.getenv('MFA_TIMEOUT', '300'))  # 5 minutes
