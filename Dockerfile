@@ -26,7 +26,7 @@ COPY README.md .
 COPY .env.example .env.example
 
 # Copy credentials (optional, can be mounted as volume)
-COPY credentials.json . 2>/dev/null || true
+# Note: credentials.json must exist at build time or be mounted as volume at runtime
 
 # Health check
 HEALTHCHECK --interval=60s --timeout=10s --start-period=30s --retries=3 \
