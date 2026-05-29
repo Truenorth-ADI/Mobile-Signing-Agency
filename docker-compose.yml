@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  ss-confirm:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ss-confirm-workflow
+    restart: unless-stopped
+    environment:
+      # Base configuration
+      BASE_DIR: /opt/ss-confirm
+      LOG_DIR: /var/log/ss-confirm
+      DOWNLOAD_DIR: /opt/ss-confirm/downloads
+      
+      # Gmail OAuth
+      GMAIL_OAUTH_CREDENTIALS_FILE: /opt/ss-confirm/credentials.json
+      
+      # SingleSource Credentials
+      SINGLESOURCE_USERNAME: ${SINGLESOURCE_USERNAME}
+      SINGLESOURCE_PASSWORD: ${SINGLESOURCE_PASSWORD}
+      
+      # Mobile Signing Agency Webhook
+      WEBHOOK_URL: ${WEBHOOK_URL}
+      WEBHOOK_SECRET: ${WEBHOOK_SECRET}
+      
+      # Monitoring options
+      MFA_TIMEOUT: 300
+      CHECK_INTERVAL: 300
+      MONITORED_EMAIL: closings@singlesourceproperty.com
+    
+    volumes:
+      # Mount credentials (or pass via .env)
+      - ./credentials.json:/opt/ss-confirm/credentials.json:ro
+      - ./downloads:/opt/ss-confirm/downloads
+      - ./logs:/var/log/ss-confirm
+    
+    networks:
+      - hermes-network
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+    
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  hermes-network:
+    external: true
